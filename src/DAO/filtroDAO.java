@@ -5,7 +5,7 @@
  */
 package DAO;
 
-import com.sun.istack.internal.logging.Logger;
+
 import conexion.conexion;
 import interfaces.metodos;
 import java.sql.PreparedStatement;
@@ -13,9 +13,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.logging.Level;
+
 import modelo.Filtro;
-import sun.util.logging.PlatformLogger;
+
 
 /**
  *
@@ -23,7 +23,7 @@ import sun.util.logging.PlatformLogger;
  */
 public class filtroDAO implements metodos<Filtro> {
 
-    private static final String SQL_INSERT ="";
+    private static final String SQL_INSERT =" INSERT INTO filtros_aceite(codFiltro,marca,stock,existencia) VALUES (?,?,?,?)";
     private static final String SQL_UPDATE ="UPDATE filtros_aceite SET marca=?,stock=?,existencia=? WHERE codFiltro=?";
     private static final String SQL_DELETE ="DELETE FROM filtros_aceite WHERE codFiltro=?";
     private static final String SQL_READ ="SELECT * FROM filtros_aceite WHERE codFiltro=?";
@@ -40,8 +40,11 @@ public class filtroDAO implements metodos<Filtro> {
             ps.setString(2,g.getMarca());
             ps.setInt(3,g.getStock());
             ps.setBoolean(4, true);
+            if(ps.executeUpdate()>0){
+                return true;
+            }
         }catch(SQLException ex){
-            System.out.println(ex.getMessage());
+            System.out.println(ex.getMessage());  
             System.out.println("no furulo");
         }finally{
             con.cerrarConexion();
@@ -60,7 +63,7 @@ public class filtroDAO implements metodos<Filtro> {
             }
         }catch(SQLException ex){
             System.out.println(ex.getMessage());
-            System.out.println("rip");
+            System.out.println("rip delete");
         }finally{
             con.cerrarConexion();
         }
@@ -73,15 +76,16 @@ public class filtroDAO implements metodos<Filtro> {
         try{
             System.out.println(c.getCodigo());
             ps=con.getCnx().prepareStatement(SQL_UPDATE);
-            ps.setString(1, c.getCodigo());
-            ps.setString(2,c.getMarca());
-            ps.setInt(3,c.getStock());
+             ps.setString(1, c.getMarca());
+            ps.setInt(2, c.getStock());
+            ps.setBoolean(3, c.isExistencia());
+            ps.setString(4, c.getCodigo());
             if(ps.executeUpdate()>0){
                 return true;
             }
         }catch(SQLException ex){
             System.out.println(ex.getMessage());
-            System.out.println("rip");
+            System.out.println("rip update");
         }finally{
             con.cerrarConexion();
         }
@@ -91,24 +95,26 @@ public class filtroDAO implements metodos<Filtro> {
 
     @Override
     public Filtro read(Object key) {
-       Filtro f=null;
-       PreparedStatement ps;
-       ResultSet rs;
-       try{
-           ps=con.getCnx().prepareStatement(SQL_READ);
-           rs=ps.executeQuery();
-           while(rs.next()){
-               f= new Filtro(rs.getInt(1),rs.getString(2),rs.getString(3),rs.getInt(4),rs.getBoolean(5));
-           }
+      Filtro f = null;
+        PreparedStatement ps;
+        ResultSet rs;
+        try {
+            ps = con.getCnx().prepareStatement(SQL_READ);
+            ps.setString(1, key.toString());
+            
+            rs = ps.executeQuery();
+            
+            while(rs.next()){
+                f = new Filtro(rs.getInt(1), rs.getString(2), rs.getString(3), rs.getInt(4), rs.getBoolean(5));
+            }
             rs.close();
-       }catch(SQLException ex){
-           System.out.println(ex.getMessage());
-           System.out.println("rip");
-       }finally{
+        } catch (SQLException ex) {
+            System.out.println(ex.getMessage());
            
-           con.cerrarConexion();
-       }
-       return f;
+        } finally{
+            con.cerrarConexion();
+        }
+        return f;
     }
 
     @Override
@@ -125,7 +131,7 @@ public class filtroDAO implements metodos<Filtro> {
             rs.close();
        }catch(SQLException ex){
            System.out.println(ex.getMessage());
-           System.out.println("rip");
+           System.out.println("rip read all");
        }finally{
            
            con.cerrarConexion();

@@ -60,6 +60,7 @@ public class Consulta extends JFrame {
         container.add(actualizar);
         container.add(limpiar);
         container.add(table);
+        container.add(eliminar);
         setSize(600, 600);
         eventos();
         
@@ -151,8 +152,8 @@ public class Consulta extends JFrame {
                 if (no.isSelected()) {
                     f.setExistencia(false);
                 }
-                if (fd.update(f)) {
-                    JOptionPane.showMessageDialog(null, "Filtro modificado con exito");
+                if (fd.create(f)) {
+                    JOptionPane.showMessageDialog(null, "Filtro agregado con exito");
                     limpiarCampos();
                     llenarTabla();
                 } else {
